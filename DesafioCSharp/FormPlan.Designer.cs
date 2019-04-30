@@ -48,14 +48,14 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.bSearch = new System.Windows.Forms.ToolStripButton();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.lResults = new System.Windows.Forms.Label();
+            this.bListAll = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // bNext
             // 
-            this.bNext.Location = new System.Drawing.Point(256, 112);
+            this.bNext.Location = new System.Drawing.Point(253, 102);
             this.bNext.Name = "bNext";
             this.bNext.Size = new System.Drawing.Size(75, 23);
             this.bNext.TabIndex = 7;
@@ -66,9 +66,9 @@
             // tEndDate
             // 
             this.tEndDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.tEndDate.Location = new System.Drawing.Point(185, 67);
+            this.tEndDate.Location = new System.Drawing.Point(196, 67);
             this.tEndDate.Name = "tEndDate";
-            this.tEndDate.Size = new System.Drawing.Size(146, 20);
+            this.tEndDate.Size = new System.Drawing.Size(170, 20);
             this.tEndDate.TabIndex = 5;
             // 
             // tStartDate
@@ -76,20 +76,20 @@
             this.tStartDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.tStartDate.Location = new System.Drawing.Point(6, 67);
             this.tStartDate.Name = "tStartDate";
-            this.tStartDate.Size = new System.Drawing.Size(144, 20);
+            this.tStartDate.Size = new System.Drawing.Size(169, 20);
             this.tStartDate.TabIndex = 4;
             // 
             // tName
             // 
             this.tName.Location = new System.Drawing.Point(6, 28);
             this.tName.Name = "tName";
-            this.tName.Size = new System.Drawing.Size(325, 20);
+            this.tName.Size = new System.Drawing.Size(360, 20);
             this.tName.TabIndex = 3;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(182, 51);
+            this.label3.Location = new System.Drawing.Point(193, 51);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(23, 13);
             this.label3.TabIndex = 2;
@@ -121,7 +121,7 @@
             // 
             // bPrevious
             // 
-            this.bPrevious.Location = new System.Drawing.Point(6, 112);
+            this.bPrevious.Location = new System.Drawing.Point(46, 102);
             this.bPrevious.Name = "bPrevious";
             this.bPrevious.Size = new System.Drawing.Size(75, 23);
             this.bPrevious.TabIndex = 6;
@@ -198,13 +198,14 @@
             this.bSave,
             this.bEdit,
             this.bDelete,
+            this.bListAll,
             this.toolStripSeparator1,
             this.toolStripLabel1,
             this.tSearch,
             this.bSearch});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(356, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(395, 25);
             this.toolStrip1.TabIndex = 2;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -216,10 +217,10 @@
             this.bSearch.Name = "bSearch";
             this.bSearch.Size = new System.Drawing.Size(23, 22);
             this.bSearch.Text = "toolStripButton5";
+            this.bSearch.Click += new System.EventHandler(this.BSearch_Click);
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.lResults);
             this.panel1.Controls.Add(this.bNext);
             this.panel1.Controls.Add(this.bPrevious);
             this.panel1.Controls.Add(this.tEndDate);
@@ -230,24 +231,24 @@
             this.panel1.Controls.Add(this.label1);
             this.panel1.Location = new System.Drawing.Point(0, 28);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(340, 149);
+            this.panel1.Size = new System.Drawing.Size(380, 136);
             this.panel1.TabIndex = 3;
             // 
-            // lResults
+            // bListAll
             // 
-            this.lResults.AutoSize = true;
-            this.lResults.Location = new System.Drawing.Point(7, 90);
-            this.lResults.Name = "lResults";
-            this.lResults.Size = new System.Drawing.Size(81, 13);
-            this.lResults.TabIndex = 8;
-            this.lResults.Text = "Foi encontrado:";
-            this.lResults.Visible = false;
+            this.bListAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bListAll.Image = ((System.Drawing.Image)(resources.GetObject("bListAll.Image")));
+            this.bListAll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bListAll.Name = "bListAll";
+            this.bListAll.Size = new System.Drawing.Size(23, 22);
+            this.bListAll.Text = "Listar todos";
+            this.bListAll.Click += new System.EventHandler(this.BListAll_Click);
             // 
             // FormPlan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(356, 194);
+            this.ClientSize = new System.Drawing.Size(395, 176);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.panel1);
             this.Name = "FormPlan";
@@ -282,6 +283,6 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton bSearch;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label lResults;
+        private System.Windows.Forms.ToolStripButton bListAll;
     }
 }

@@ -52,6 +52,7 @@
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.tSearch = new System.Windows.Forms.ToolStripTextBox();
             this.bSearch = new System.Windows.Forms.ToolStripButton();
+            this.bListAll = new System.Windows.Forms.ToolStripButton();
             this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -83,7 +84,7 @@
             this.panel1.Controls.Add(this.LFirstName);
             this.panel1.Location = new System.Drawing.Point(4, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(409, 186);
+            this.panel1.Size = new System.Drawing.Size(445, 176);
             this.panel1.TabIndex = 1;
             // 
             // BAdd
@@ -148,7 +149,7 @@
             // 
             this.tBirth.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.tBirth.Location = new System.Drawing.Point(225, 90);
-            this.tBirth.MaxDate = new System.DateTime(2019, 4, 23, 0, 0, 0, 0);
+            this.tBirth.MaxDate = new System.DateTime(2189, 12, 31, 0, 0, 0, 0);
             this.tBirth.Name = "tBirth";
             this.tBirth.Size = new System.Drawing.Size(168, 20);
             this.tBirth.TabIndex = 7;
@@ -202,13 +203,14 @@
             this.bSave,
             this.bEdit,
             this.bTrash,
+            this.bListAll,
             this.toolStripSeparator1,
             this.toolStripLabel1,
             this.tSearch,
             this.bSearch});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(409, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(445, 25);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -273,6 +275,7 @@
             this.tSearch.Name = "tSearch";
             this.tSearch.Size = new System.Drawing.Size(200, 25);
             this.tSearch.ToolTipText = "Digite o nome do usuário";
+            this.tSearch.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TSearch_KeyUp);
             // 
             // bSearch
             // 
@@ -284,11 +287,21 @@
             this.bSearch.Text = "toolStripButton4";
             this.bSearch.Click += new System.EventHandler(this.BSearch_Click);
             // 
+            // bListAll
+            // 
+            this.bListAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.bListAll.Image = ((System.Drawing.Image)(resources.GetObject("bListAll.Image")));
+            this.bListAll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.bListAll.Name = "bListAll";
+            this.bListAll.Size = new System.Drawing.Size(23, 22);
+            this.bListAll.Text = "Listar todos";
+            this.bListAll.Click += new System.EventHandler(this.BListAll_Click);
+            // 
             // CRUD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(419, 193);
+            this.ClientSize = new System.Drawing.Size(454, 189);
             this.Controls.Add(this.panel1);
             this.Name = "CRUD";
             this.Text = "CRUD";
@@ -325,5 +338,6 @@
         private System.Windows.Forms.ToolStripTextBox tSearch;
         private System.Windows.Forms.ToolStripButton bSearch;
         private System.Windows.Forms.Button BAdd;
+        private System.Windows.Forms.ToolStripButton bListAll;
     }
 }

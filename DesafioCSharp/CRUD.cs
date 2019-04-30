@@ -25,10 +25,18 @@ namespace DesafioCSharp
             InitializeComponent();
             if (!planList.Any())
             {
+                planDao.SelectAll();
                 planDao.ListAll();
                 planList = planDao.GetList();
             }
-            Console.WriteLine("MASOQ"+planList.Count());
+            if (!userList.Any())
+            {
+                userDao.SelectAll();
+                userDao.ListAll();
+                userList = userDao.GetList();
+
+            }
+
             cPlan.DataSource = planList;
             cPlan.DisplayMember = "Name";
             cPlan.ValueMember = "Id";
@@ -49,47 +57,57 @@ namespace DesafioCSharp
             tBirth.Enabled = true;
             tFirstName.Text = "";
             tLastName.Text = "";
+            tBirth.Value = DateTime.Now;
             cPlan.SelectedValue = 1;
             edit = false;
         }
 
         private void BSave_Click(object sender, EventArgs e)
         {
-            if (edit == true)
+            if (tFirstName.ReadOnly)
             {
-                if (tFirstName.Text == "" || tLastName.Text == "" )
-                {
-                    MessageBox.Show("Selecione um usuário para editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
-                else
-                {
-                    bool returnDao = userDao.UpdateUser(new User(userList[index].Id,tFirstName.Text, tLastName.Text, tBirth.Value, (int)cPlan.SelectedValue), index);
-                    if (returnDao == true)
-                    {
-                        MessageBox.Show("Usuário editado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else if (returnDao == false)
-                    {
-                        MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
+                MessageBox.Show("Crie um novo usuário para salvar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             else
             {
-                if (tFirstName.Text == "" || tLastName.Text == "")
+                if (edit == true)
                 {
-                    MessageBox.Show("Preencha os campos necessários.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
-                else
-                {
-                    bool returnDao = userDao.InsertUser(new User(tFirstName.Text, tLastName.Text, tBirth.Value, (int)cPlan.SelectedValue));
-                    if (returnDao == true)
+                    if (tFirstName.Text == "" || tLastName.Text == "" )
                     {
-                        MessageBox.Show("Usuário criado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Selecione um usuário para editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     }
                     else
                     {
-                        MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        bool returnDao = userDao.UpdateUser(new User(userList[index].Id,tFirstName.Text, tLastName.Text, tBirth.Value, (int)cPlan.SelectedValue), index);
+                        if (returnDao == true)
+                        {
+                            MessageBox.Show("Usuário editado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            userDao.ListAll();
+                        }
+                        else if (returnDao == false)
+                        {
+                            MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+                else
+                {
+                    if (tFirstName.Text == "" || tLastName.Text == "")
+                    {
+                        MessageBox.Show("Preencha os campos necessários.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    }
+                    else
+                    {
+                        bool returnDao = userDao.InsertUser(new User(tFirstName.Text, tLastName.Text, tBirth.Value, (int)cPlan.SelectedValue));
+                        if (returnDao == true)
+                        {
+                            MessageBox.Show("Usuário criado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            userDao.ListAll();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
                 }
             }
@@ -99,16 +117,10 @@ namespace DesafioCSharp
         {
             FormPlan planF = new FormPlan();
             planF.Show();
-            Close();
         }
 
         private void BFirst_Click(object sender, EventArgs e)
         {
-            if (!userList.Any())
-            {
-                userDao.ListAll();
-                userList = userDao.GetList();
-            }
             bNext.Enabled = true;
             bPrevious.Enabled = false;
             tFirstName.ReadOnly = true;
@@ -125,19 +137,21 @@ namespace DesafioCSharp
         {
             if (!userList.Any())
             {
-                userDao.ListAll();
-                userList = userDao.GetList();
+                MessageBox.Show("Não há usuários para mostrar", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            bPrevious.Enabled = true;
-            bNext.Enabled = false;
-            tFirstName.ReadOnly = true;
-            tLastName.ReadOnly = true;
-            cPlan.Enabled = false;
-            tBirth.Enabled = false;
-            tFirstName.Text = userList[userList.Count()-1].FirstName;
-            tLastName.Text = userList[userList.Count() - 1].LastName;
-            cPlan.SelectedValue = userList[userList.Count() - 1].PlanId;
-            index = userList.Count() - 1;
+            else
+            {
+                bPrevious.Enabled = true;
+                bNext.Enabled = false;
+                tFirstName.ReadOnly = true;
+                tLastName.ReadOnly = true;
+                cPlan.Enabled = false;
+                tBirth.Enabled = false;
+                tFirstName.Text = userList[userList.Count()-1].FirstName;
+                tLastName.Text = userList[userList.Count() - 1].LastName;
+                cPlan.SelectedValue = userList[userList.Count() - 1].PlanId;
+                index = userList.Count() - 1;
+            }
         }
 
         private void BPrevious_Click(object sender, EventArgs e)
@@ -146,8 +160,9 @@ namespace DesafioCSharp
             {
                 if (!userList.Any()) //se n houver inicializado a lista de usuários
                 {
-                    userDao.ListAll();
-                    userList = userDao.GetList();
+                    MessageBox.Show("Não há usuários para mostrar", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+                else if(!tFirstName.ReadOnly && index == 0){ //Se for o primeiro percorrimento da lista
                     tFirstName.ReadOnly = true;
                     tLastName.ReadOnly = true;
                     cPlan.Enabled = false;
@@ -156,7 +171,7 @@ namespace DesafioCSharp
                     tLastName.Text = userList[0].LastName;
                     cPlan.SelectedValue = userList[0].PlanId;
                     index = 0;
-                }else
+                }
                if (index < userList.Count())
                 {
                     index--;
@@ -193,8 +208,10 @@ namespace DesafioCSharp
             {
                 if (!userList.Any()) //se n houver inicializado a lista de usuários
                 {
-                    userDao.ListAll();
-                    userList = userDao.GetList();
+                    MessageBox.Show("Não há usuários para mostrar", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }else 
+                if (!tFirstName.ReadOnly && index == 0)
+                {
                     tFirstName.ReadOnly = true;
                     tLastName.ReadOnly = true;
                     cPlan.Enabled = false;
@@ -202,7 +219,6 @@ namespace DesafioCSharp
                     tFirstName.Text = userList[0].FirstName;
                     tLastName.Text = userList[0].LastName;
                     cPlan.SelectedValue = userList[0].PlanId;
-                    index = 0;
                 }else
                 if (index < userList.Count())
                 {
@@ -248,27 +264,117 @@ namespace DesafioCSharp
 
         private void BTrash_Click(object sender, EventArgs e)
         {
-            if(tFirstName.Text == ""|| tLastName.Text == "" || tBirth.Value.ToString() == "")
+            var result = MessageBox.Show("Deseja excluir o usuário?", "Aviso", MessageBoxButtons.YesNo);
+            if (result == System.Windows.Forms.DialogResult.Yes)
             {
-                MessageBox.Show("Selecione um usuário para deletar.", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }else
-            {
-                bool returnDao = userDao.DeletetUser(userList[index], index);
-                if (returnDao == true)
+                if(tFirstName.Text == ""|| tLastName.Text == "" || tBirth.Value.ToString() == "")
                 {
-                    MessageBox.Show("Usuário deletado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                }
-                else if (returnDao == false)
+                    MessageBox.Show("Selecione um usuário para deletar.", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }else
                 {
-                    MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    bool returnDao = userDao.DeletetUser(userList[index]);
+                    if (returnDao == true)
+                    {
+                        MessageBox.Show("Usuário deletado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        userDao.ListAll();
+                        if (index == 0) //deletou o primeiro
+                        {
+                            MessageBox.Show("Não há mais usuários. Cadastre um.", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            tFirstName.ReadOnly = false;
+                            tLastName.ReadOnly = false;
+                            tBirth.Enabled = true;
+                            cPlan.Enabled = true;
+                            tFirstName.Text = "";
+                            tLastName.Text = "";
+                            tBirth.Value = DateTime.Now;
+                            cPlan.SelectedValue = 1;
+                        }
+                        else if (index > 0)
+                        {
+                            index--;
+                            tFirstName.Text = userList[index].FirstName;
+                            tLastName.Text = userList[index].LastName;
+                            cPlan.SelectedValue = userList[index].PlanId;
+                            tBirth.Value = userList[index].Birth;
+                        }
+                    }
+                    else if (returnDao == false)
+                    {
+                        MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }
 
         private void BSearch_Click(object sender, EventArgs e)
         {
+            userList = userDao.Search(tSearch.Text);
+            if (!userList.Any())
+            {
+                MessageBox.Show("Não há usuários com este nome", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                userList.Clear();
+                userDao.ListAll();
+            }
+            else
+            {
+                index = 0;
+                tFirstName.ReadOnly = true;
+                tLastName.ReadOnly = true;
+                tBirth.Enabled = false;
+                cPlan.Enabled = false;
+                tFirstName.Text = userList[index].FirstName;
+                tLastName.Text = userList[index].LastName;
+                tBirth.Value = userList[index].Birth;
+                cPlan.SelectedValue = userList[index].PlanId;
+            }
 
+        }
+
+        private void TSearch_KeyUp(object sender, KeyEventArgs e)
+        {
+            if ((Keys)e.KeyCode == Keys.Enter)
+            {
+                userList = userDao.Search(tSearch.Text);
+                if (!userList.Any())
+                {
+                    MessageBox.Show("Não há usuários com este nome", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    userList.Clear();
+                    userDao.ListAll();
+                }
+                else
+                {
+                    index = 0;
+                    tFirstName.ReadOnly = true;
+                    tLastName.ReadOnly = true;
+                    tBirth.Enabled = false;
+                    cPlan.Enabled = false;
+                    tFirstName.Text = userList[index].FirstName;
+                    tLastName.Text = userList[index].LastName;
+                    tBirth.Value = userList[index].Birth;
+                    cPlan.SelectedValue = userList[index].PlanId;
+                }
+            }
+        }
+
+        private void BListAll_Click(object sender, EventArgs e)
+        {
+            userDao.ListAll();
+            userList = userDao.GetList();
+            if(!userList.Any()){
+                MessageBox.Show("Não há mais usuários a serem listados", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                index = 0;
+                tFirstName.ReadOnly = true;
+                tLastName.ReadOnly = true;
+                tBirth.Enabled = false;
+                cPlan.Enabled = false;
+                tFirstName.Text = userList[index].FirstName;
+                tLastName.Text = userList[index].LastName;
+                tBirth.Value = userList[index].Birth;
+                cPlan.SelectedValue = userList[index].PlanId;
+            }
         }
     }
 }

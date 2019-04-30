@@ -21,52 +21,65 @@ namespace DesafioCSharp
         public FormPlan()
         {
             InitializeComponent();
-            planList.Clear();
+            if (!planList.Any())
+            {
+                planDao.SelectAll();
+                planDao.ListAll();
+                planList = planDao.GetList();
+            }
             index = 0;
-
         }
 
         private void BSave_Click(object sender, EventArgs e)
         {
-            if (edit == true)
+            if (tName.ReadOnly)
             {
-                if (tName.Text == "")
+                MessageBox.Show("Crie um novo plano.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            else {
+                if (edit == true)
                 {
-                    MessageBox.Show("Selecione um plano para editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    if (tName.Text == "")
+                    {
+                        MessageBox.Show("Selecione um plano para editar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    }
+                    else
+                    {
+                        bool returnDao = planDao.UpdatePlan(new Plan(planList[index].Id,tName.Text, tStartDate.Value, tEndDate.Value));
+                        if (returnDao == true)
+                        {
+                            MessageBox.Show("Plano atualizado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            planDao.ListAll();
+                        }
+                        else if (returnDao == false)
+                        {
+                            MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    edit = false;
                 }
                 else
                 {
-                    bool returnDao = planDao.UpdatePlan(new Plan(planList[index].Id,tName.Text, tStartDate.Value, tEndDate.Value), index);
-                    if (returnDao == true)
+                    if (tName.Text == "")
                     {
-                        MessageBox.Show("Plano atualizado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Forneça um nome para o plano.");
                     }
-                    else if (returnDao == false)
+                    else
                     {
-                        MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                edit = false;
-            }
-            else
-            {
-                if (tName.Text == "")
-                {
-                    MessageBox.Show("Forneça um nome para o plano.");
-                }
-                else
-                {
-                    bool returnDao = planDao.InsertPlan(new Plan(tName.Text, tStartDate.Value, tEndDate.Value));
-                    if (returnDao == true)
-                    {
-                        MessageBox.Show("Plano criado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else if (returnDao == false)
-                    {
-                        MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        bool returnDao = planDao.InsertPlan(new Plan(tName.Text, tStartDate.Value, tEndDate.Value));
+                        if (returnDao == true)
+                        {
+                            MessageBox.Show("Plano criado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            planDao.ListAll();
+                        }
+                        else if (returnDao == false)
+                        {
+                            MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
                 }
             }
+
             edit = false;
         }
 
@@ -74,18 +87,12 @@ namespace DesafioCSharp
         {
             if((Keys)e.KeyCode == Keys.Enter)
             {
-                if (!planList.Any())
-                {
-                    planList = planDao.GetList();
-
-                }
-                resultList = planList.Where(plann => plann.Name.ToLower().Contains(tSearch.Text.ToLower())).ToList();
-                planList.Clear();
-                planList = resultList;
-                if (!resultList.Any())
+                planList = planDao.SearchPlan(tSearch.Text);
+                if (!planList.Any()) //se estiver vazio
                 {
                     MessageBox.Show("Não há planos com este nome","Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    
+                    planList.Clear();
+                    planDao.ListAll();
                 }
                 else
                 {
@@ -104,9 +111,12 @@ namespace DesafioCSharp
         {
             try
             {
-                if (!planList.Any())
+                if (!planList.Any())//verifica se está vazio
                 {
-                    planList = planDao.GetList();
+                    MessageBox.Show("Não há planos para mostrar", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+                else if(!tName.ReadOnly && index == 0)
+                {
                     tName.ReadOnly = true;
                     tStartDate.Enabled = false;
                     tEndDate.Enabled = false;
@@ -147,57 +157,56 @@ namespace DesafioCSharp
 
         private void BDelete_Click(object sender, EventArgs e)
         {
-            if (tName.Text == "" || tStartDate.Value.ToString() == "" || tEndDate.Value.ToString() == "")
+            var result = MessageBox.Show("Deseja excluir o usuário?", "Aviso", MessageBoxButtons.YesNo);
+            if (result == System.Windows.Forms.DialogResult.Yes)
             {
-                MessageBox.Show("Selecione um plano para deletar.", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-            else
-            {
-                bool returnDao = planDao.DeletePlan(planList[index], index);
-                if (returnDao == true)
+                if (tName.Text == "" || tStartDate.Value.ToString() == "" || tEndDate.Value.ToString() == "")
                 {
-                    MessageBox.Show("Plano deletado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    planList = planDao.GetList();
-                    if (index == 0 ) //deletou o primeiro
+                    MessageBox.Show("Selecione um plano para deletar.", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+                else
+                {
+                    bool returnDao = planDao.DeletePlan(planList[index], index);
+                    if (returnDao == true)
                     {
-                        tName.Text = "";
-                    }else if(index > 0)
+                        MessageBox.Show("Plano deletado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        planDao.ListAll();
+                        if (index == 0 ) //deletou o primeiro
+                        {
+                            tName.Text = "";
+                        }else if(index > 0)
+                        {
+                            index--;
+                            tName.Text = planList[index].Name;
+                            tStartDate.Value = planList[index].StartDate;
+                            tEndDate.Value = planList[index].EndDate;
+                        }
+                    }
+                    else if (returnDao == false)
                     {
-                        index--;
-                        tName.Text = planList[index].Name;
-                        tStartDate.Value = planList[index].StartDate;
-                        tEndDate.Value = planList[index].EndDate;
+                        MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
-                else if (returnDao == false)
-                {
-                    MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
             }
-
         }
 
         private void BPrevious_Click(object sender, EventArgs e)
         {
             try
             {
-                if (!planList.Any())//verifica se estar vazio
+                if (!planList.Any())//verifica se está vazio
                 {
-                    planList = planDao.GetList();
-                    if (!planList.Any())//se continuar vazio, n há planos
-                    {
-                        MessageBox.Show("Não há planos para mostrar","Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    }
-                    else
-                    {
-                        tName.ReadOnly = true;
-                        tStartDate.Enabled = false;
-                        tEndDate.Enabled = false;
-                        tName.Text = planList[0].Name;
-                        tStartDate.Value = planList[0].StartDate;
-                        tStartDate.Value = planList[0].EndDate;
-                        index = 0;
-                    }
+                    MessageBox.Show("Não há planos para mostrar","Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+                else
+                if(!tName.ReadOnly && index == 0)//Se for o primeiro percorrimento da lista
+                {
+                    tName.ReadOnly = true;
+                    tStartDate.Enabled = false;
+                    tEndDate.Enabled = false;
+                    tName.Text = planList[0].Name;
+                    tStartDate.Value = planList[0].StartDate;
+                    tStartDate.Value = planList[0].EndDate;
                 }
                 else
                 {
@@ -232,9 +241,7 @@ namespace DesafioCSharp
         private void BNew_Click(object sender, EventArgs e)
         {
             index = 0;
-            Console.WriteLine("a"+tName.ReadOnly);
             tName.ReadOnly = false;
-            Console.WriteLine("a" + tName.ReadOnly);
             tStartDate.Enabled = true;
             tEndDate.Enabled = true;
             tName.Text = "";
@@ -245,7 +252,6 @@ namespace DesafioCSharp
 
         private void BEdit_Click(object sender, EventArgs e)
         {
-
             tName.ReadOnly = false;
             tStartDate.Enabled = true;
             tEndDate.Enabled = true;
@@ -255,9 +261,47 @@ namespace DesafioCSharp
         private void BBack_Click(object sender, EventArgs e)
         {
             Close();
-            CRUD crud = new CRUD();
-            crud.UpdatePlanList();
-            crud.Show();
+        }
+
+        private void BSearch_Click(object sender, EventArgs e)
+        {
+            planList = planDao.SearchPlan(tSearch.Text);
+            if (!planList.Any()) //se estiver vazio
+            {
+                MessageBox.Show("Não há planos com este nome", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                planList.Clear();
+                planDao.ListAll();
+            }
+            else
+            {
+                index = 0;
+                tName.ReadOnly = true;
+                tStartDate.Enabled = false;
+                tEndDate.Enabled = false;
+                tName.Text = planList[index].Name;
+                tStartDate.Value = planList[index].StartDate;
+                tEndDate.Value = planList[index].EndDate;
+            }
+        }
+
+        private void BListAll_Click(object sender, EventArgs e)
+        {
+            planDao.ListAll();
+            planList = planDao.GetList();
+            if (!planList.Any())
+            {
+                MessageBox.Show("Não há mais planos a serem listados", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                index = 0;
+                tName.ReadOnly = true;
+                tStartDate.Enabled = false;
+                tEndDate.Enabled = false;
+                tName.Text = planList[index].Name;
+                tStartDate.Value = planList[index].StartDate;
+                tEndDate.Value = planList[index].EndDate;
+            }
         }
     }
 }

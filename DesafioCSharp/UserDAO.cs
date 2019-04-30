@@ -12,16 +12,21 @@ namespace DesafioCSharp
     {
         public SqlConnection sql = new ConnectDb().DbConnect();
         public SqlCommand command = new SqlCommand();
+        internal static Dictionary<int, User> userDictionary = new Dictionary<int, User>(); 
         internal static List<User> userList = new List<User>();
 
         public List<User> GetList()
         {
             return userList;
         }
-        public void ListAll()
+
+        public List<User> Search(string search)
+        {
+            return userList.Where(u => u.FirstName.ToLower().Contains(search.ToLower()) || u.LastName.ToLower().Contains(search.ToLower())).ToList();
+        }
+        public void SelectAll()
         {
             command.Connection = sql;
-            Console.WriteLine(command.Connection.State);
             command.CommandText = "SELECT * FROM USERS";
 
             if (sql.State == ConnectionState.Open)
@@ -36,8 +41,11 @@ namespace DesafioCSharp
                 {
                     while (reader.Read())
                     {
-                        userList.Add(new User((int)reader["ID"], reader["FIRSTNAME"].ToString(),reader["LASTNAME"].ToString(), 
-                                     Convert.ToDateTime(reader["BIRTH"]), (int)reader["PLANID"]));
+                        if (!userDictionary.ContainsKey((int)reader["ID"]))
+                        {
+                            userDictionary.Add((int)reader["ID"], new User(reader["FIRSTNAME"].ToString(), reader["LASTNAME"].ToString(),
+                                         Convert.ToDateTime(reader["BIRTH"]), (int)reader["PLANID"]));
+                        }
                     }
                 }
 
@@ -49,7 +57,16 @@ namespace DesafioCSharp
             }
             finally
             {
-               sql.Close();
+                sql.Close();
+            }
+
+        }
+        public void ListAll()
+        {
+            userList.Clear();
+            foreach (var user in userDictionary)
+            {
+                userList.Add(new User(user.Key, user.Value.FirstName, user.Value.LastName, user.Value.Birth, user.Value.PlanId));
             }
         }
         public bool InsertUser(User user)
@@ -71,7 +88,7 @@ namespace DesafioCSharp
                 sql.Open();
                 var idOfInserted = Convert.ToInt32(command.ExecuteScalar());
                 command.Parameters.Clear();
-                userList.Add(new User(idOfInserted, user.FirstName, user.LastName, user.Birth, user.PlanId));
+                userDictionary.Add(idOfInserted, new User(user.FirstName, user.LastName, user.Birth, user.PlanId));
                 return true;
             }
             catch (SqlException ex)
@@ -108,7 +125,7 @@ namespace DesafioCSharp
                 sql.Open();
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
-                userList[index] = user;
+                userDictionary[user.Id] = user;
                 return true;
 
             }
@@ -123,7 +140,7 @@ namespace DesafioCSharp
                 sql.Close();
             }
         }
-        public bool DeletetUser(User user, int index)
+        public bool DeletetUser(User user)
         {
             command.Connection = sql;
             command.CommandText = "DELETE FROM USERS WHERE ID = @ID";
@@ -139,7 +156,7 @@ namespace DesafioCSharp
                 sql.Open();
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
-                userList.RemoveAt(index);
+                userDictionary.Remove(user.Id);
                 return true;
 
             }

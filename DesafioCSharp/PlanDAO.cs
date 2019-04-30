@@ -36,8 +36,11 @@ namespace DesafioCSharp
                 {
                     while (reader.Read())
                     {
-                        planDictionary.Add((int)reader["ID"], new Plan(reader["NAME"].ToString(),
-                                      Convert.ToDateTime(reader["STARTDATE"]), Convert.ToDateTime(reader["ENDDATE"])));
+                        if (!planDictionary.ContainsKey((int)reader["ID"]))
+                        {
+                            planDictionary.Add((int)reader["ID"], new Plan(reader["NAME"].ToString(),
+                                          Convert.ToDateTime(reader["STARTDATE"]), Convert.ToDateTime(reader["ENDDATE"])));
+                        }
                     }
                 }
 
@@ -55,35 +58,16 @@ namespace DesafioCSharp
         }
         public void ListAll()
         {
-            command.Connection = sql;
-            command.CommandText = "SELECT * FROM PLANS";
-            if (sql.State == ConnectionState.Open)
+            planList.Clear();
+            foreach (var plan in planDictionary)
             {
-                sql.Close();
+                planList.Add(new Plan(plan.Key, plan.Value.Name, plan.Value.StartDate, plan.Value.EndDate));
             }
-            try
-            {
-                sql.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        planList.Add(new Plan((int)reader["ID"], reader["NAME"].ToString(), 
-                                      Convert.ToDateTime(reader["STARTDATE"]), Convert.ToDateTime(reader["ENDDATE"])));
-                    }
-                }
+        }
 
-            }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("Ocorreu um erro: " + ex);
-            }
-            finally
-            {
-                command.Dispose();
-                sql.Close();
-            }
+        public List<Plan> SearchPlan(string search)
+        {
+            return planList.Where(p => p.Name.ToLower().Contains(search.ToLower())).ToList();
         }
 
         public bool InsertPlan(Plan plan)
@@ -104,7 +88,7 @@ namespace DesafioCSharp
                 sql.Open();
                 var idOfInserted = Convert.ToInt32(command.ExecuteScalar());
                 command.Parameters.Clear();
-                planList.Add(new Plan(idOfInserted, plan.Name, plan.StartDate, plan.EndDate));
+                planDictionary.Add(idOfInserted, new Plan(plan.Name, plan.StartDate, plan.EndDate));
 
                 return true;
 
@@ -120,7 +104,7 @@ namespace DesafioCSharp
                 sql.Close();
             }
         }
-        public bool UpdatePlan(Plan plan, int index)
+        public bool UpdatePlan(Plan plan)
         {
             command.Connection = sql;
             command.CommandText = @"UPDATE PLANS SET NAME = @NAME, STARTDATE = @STARTDATE, 
@@ -140,7 +124,7 @@ namespace DesafioCSharp
                 sql.Open();
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
-                planList[index] = plan;
+                planDictionary[plan.Id] = plan;
                 return true;
 
             }
@@ -171,7 +155,7 @@ namespace DesafioCSharp
                 sql.Open();
                 command.ExecuteNonQuery();
                 command.Parameters.Clear();
-                planList.RemoveAt(index);
+                planDictionary.Remove(plan.Id);
                 return true;
 
             }
