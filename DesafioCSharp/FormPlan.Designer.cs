@@ -48,6 +48,7 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.bSearch = new System.Windows.Forms.ToolStripButton();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.lResults = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -213,11 +214,12 @@
             this.bSearch.Image = ((System.Drawing.Image)(resources.GetObject("bSearch.Image")));
             this.bSearch.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bSearch.Name = "bSearch";
-            this.bSearch.Size = new System.Drawing.Size(23, 20);
+            this.bSearch.Size = new System.Drawing.Size(23, 22);
             this.bSearch.Text = "toolStripButton5";
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.lResults);
             this.panel1.Controls.Add(this.bNext);
             this.panel1.Controls.Add(this.bPrevious);
             this.panel1.Controls.Add(this.tEndDate);
@@ -230,6 +232,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(340, 149);
             this.panel1.TabIndex = 3;
+            // 
+            // lResults
+            // 
+            this.lResults.AutoSize = true;
+            this.lResults.Location = new System.Drawing.Point(7, 90);
+            this.lResults.Name = "lResults";
+            this.lResults.Size = new System.Drawing.Size(81, 13);
+            this.lResults.TabIndex = 8;
+            this.lResults.Text = "Foi encontrado:";
+            this.lResults.Visible = false;
             // 
             // FormPlan
             // 
@@ -270,5 +282,6 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton bSearch;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label lResults;
     }
 }

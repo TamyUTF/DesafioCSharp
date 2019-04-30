@@ -30,7 +30,13 @@ namespace DesafioCSharp
         public string LastName { get; private set; }
         public DateTime Birth { get; private set; }
         public int PlanId { get; private set; }
-
+        public override string ToString()
+        {
+ 
+            return  $"Nome: {FirstName} {LastName}"+
+                    $"Nasc.: {Birth}"+
+                    $"IdPlan: {PlanId}";
+        }
 
     }
 }

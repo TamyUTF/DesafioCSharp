@@ -220,6 +220,7 @@
             this.bNew.Name = "bNew";
             this.bNew.Size = new System.Drawing.Size(23, 22);
             this.bNew.Text = "toolStripButton1";
+            this.bNew.ToolTipText = "Novo";
             this.bNew.Click += new System.EventHandler(this.BNew_Click);
             // 
             // bSave
@@ -230,6 +231,7 @@
             this.bSave.Name = "bSave";
             this.bSave.Size = new System.Drawing.Size(23, 22);
             this.bSave.Text = "toolStripButton1";
+            this.bSave.ToolTipText = "Salvar";
             this.bSave.Click += new System.EventHandler(this.BSave_Click);
             // 
             // bEdit
@@ -240,6 +242,7 @@
             this.bEdit.Name = "bEdit";
             this.bEdit.Size = new System.Drawing.Size(23, 22);
             this.bEdit.Text = "toolStripButton5";
+            this.bEdit.ToolTipText = "Editar";
             this.bEdit.Click += new System.EventHandler(this.BEdit_Click);
             // 
             // bTrash
@@ -250,6 +253,7 @@
             this.bTrash.Name = "bTrash";
             this.bTrash.Size = new System.Drawing.Size(23, 22);
             this.bTrash.Text = "toolStripButton2";
+            this.bTrash.ToolTipText = "Deletar";
             this.bTrash.Click += new System.EventHandler(this.BTrash_Click);
             // 
             // toolStripSeparator1
@@ -268,6 +272,7 @@
             this.tSearch.BackColor = System.Drawing.SystemColors.Window;
             this.tSearch.Name = "tSearch";
             this.tSearch.Size = new System.Drawing.Size(200, 25);
+            this.tSearch.ToolTipText = "Digite o nome do usuário";
             // 
             // bSearch
             // 
@@ -277,6 +282,7 @@
             this.bSearch.Name = "bSearch";
             this.bSearch.Size = new System.Drawing.Size(23, 22);
             this.bSearch.Text = "toolStripButton4";
+            this.bSearch.Click += new System.EventHandler(this.BSearch_Click);
             // 
             // CRUD
             // 

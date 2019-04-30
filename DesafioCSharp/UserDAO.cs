@@ -21,7 +21,9 @@ namespace DesafioCSharp
         public void ListAll()
         {
             command.Connection = sql;
+            Console.WriteLine(command.Connection.State);
             command.CommandText = "SELECT * FROM USERS";
+
             if (sql.State == ConnectionState.Open)
             {
                 sql.Close();
@@ -47,7 +49,7 @@ namespace DesafioCSharp
             }
             finally
             {
-                sql.Dispose();
+               sql.Close();
             }
         }
         public bool InsertUser(User user)
@@ -62,17 +64,15 @@ namespace DesafioCSharp
 
             if (sql.State == ConnectionState.Open)
             {
-                sql.Close();
-                var idOfInserted = Convert.ToInt32(command.ExecuteScalar());
-                userList.Add(new User(idOfInserted,user.FirstName, user.LastName, user.Birth, user.PlanId));
+                sql.Close();   
             }
             try
             {
                 sql.Open();
-                command.ExecuteNonQuery();
-                sql.Close();
+                var idOfInserted = Convert.ToInt32(command.ExecuteScalar());
+                command.Parameters.Clear();
+                userList.Add(new User(idOfInserted, user.FirstName, user.LastName, user.Birth, user.PlanId));
                 return true;
-
             }
             catch (SqlException ex)
             {
@@ -81,11 +81,13 @@ namespace DesafioCSharp
             }
             finally
             {
-                sql.Dispose();
+                command.Dispose();
+                sql.Close();
             }
         }
-        public bool UpdateUser(User user, int userId, int index)
+        public bool UpdateUser(User user, int index)
         {
+            Console.WriteLine(user.Id);
             command.Connection = sql;
             command.CommandText = @"UPDATE USERS SET 
                                     FIRSTNAME = @FIRSTNAME, LASTNAME = @LASTNAME,
@@ -95,13 +97,18 @@ namespace DesafioCSharp
             command.Parameters.AddWithValue("@LASTNAME", user.LastName);
             command.Parameters.AddWithValue("@BIRTH", user.Birth);
             command.Parameters.AddWithValue("@PLANID", user.PlanId);
-            command.Parameters.AddWithValue("@ID", userId);
+            command.Parameters.AddWithValue("@ID", user.Id);
 
+            if (sql.State == ConnectionState.Open)
+            {
+                sql.Close();
+            }
             try
             {
                 sql.Open();
                 command.ExecuteNonQuery();
-                userList[index] = new User(userId, user.FirstName, user.LastName, user.Birth,user.PlanId);
+                command.Parameters.Clear();
+                userList[index] = user;
                 return true;
 
             }
@@ -112,10 +119,11 @@ namespace DesafioCSharp
             }
             finally
             {
+                command.Dispose();
                 sql.Close();
             }
         }
-        public bool DeletetUser(User user)
+        public bool DeletetUser(User user, int index)
         {
             command.Connection = sql;
             command.CommandText = "DELETE FROM USERS WHERE ID = @ID";
@@ -124,9 +132,14 @@ namespace DesafioCSharp
 
             try
             {
+                if (sql.State == ConnectionState.Open)
+                {
+                    sql.Close();
+                }
                 sql.Open();
                 command.ExecuteNonQuery();
-                userList.Remove(user);
+                command.Parameters.Clear();
+                userList.RemoveAt(index);
                 return true;
 
             }
@@ -137,6 +150,7 @@ namespace DesafioCSharp
             }
             finally
             {
+                command.Dispose();
                 sql.Close();
             }
         }

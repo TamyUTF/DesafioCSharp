@@ -21,26 +21,36 @@ namespace DesafioCSharp
 
         public CRUD()
         {
+
             InitializeComponent();
-            planDao.ListAll();
-            planList = planDao.GetList();
-            Console.WriteLine(planList.Count());
+            if (!planList.Any())
+            {
+                planDao.ListAll();
+                planList = planDao.GetList();
+            }
+            Console.WriteLine("MASOQ"+planList.Count());
             cPlan.DataSource = planList;
             cPlan.DisplayMember = "Name";
             cPlan.ValueMember = "Id";
             index = 0;
         }
 
+        public void UpdatePlanList() //atualiza a lista de plano após fechar 'FormPlan'
+        {
+            planList = planDao.GetList();
+        }
+
         private void BNew_Click(object sender, EventArgs e)
         {
             index = 0;
-            tFirstName.Enabled = true;
-            tLastName.Enabled = true;
+            tFirstName.ReadOnly = false;
+            tLastName.ReadOnly = false;
             cPlan.Enabled = true;
             tBirth.Enabled = true;
             tFirstName.Text = "";
             tLastName.Text = "";
             cPlan.SelectedValue = 1;
+            edit = false;
         }
 
         private void BSave_Click(object sender, EventArgs e)
@@ -53,18 +63,35 @@ namespace DesafioCSharp
                 }
                 else
                 {
-                    bool returnDao = userDao.UpdateUser();
+                    bool returnDao = userDao.UpdateUser(new User(userList[index].Id,tFirstName.Text, tLastName.Text, tBirth.Value, (int)cPlan.SelectedValue), index);
+                    if (returnDao == true)
+                    {
+                        MessageBox.Show("Usuário editado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else if (returnDao == false)
+                    {
+                        MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
-            }
-            User user = new User(tFirstName.Text, tLastName.Text, tBirth.Value, (int)cPlan.SelectedValue);
-            bool userDao = new UserDAO().InsertUser(user);
-            if (userDao == true)
-            {
-                MessageBox.Show("Usuário criado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (tFirstName.Text == "" || tLastName.Text == "")
+                {
+                    MessageBox.Show("Preencha os campos necessários.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+                else
+                {
+                    bool returnDao = userDao.InsertUser(new User(tFirstName.Text, tLastName.Text, tBirth.Value, (int)cPlan.SelectedValue));
+                    if (returnDao == true)
+                    {
+                        MessageBox.Show("Usuário criado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
             }
         }
 
@@ -72,6 +99,7 @@ namespace DesafioCSharp
         {
             FormPlan planF = new FormPlan();
             planF.Show();
+            Close();
         }
 
         private void BFirst_Click(object sender, EventArgs e)
@@ -212,7 +240,10 @@ namespace DesafioCSharp
         private void BEdit_Click(object sender, EventArgs e)
         {
             edit = true;
-
+            tFirstName.ReadOnly = false;
+            tLastName.ReadOnly = false;
+            tBirth.Enabled = true;
+            cPlan.Enabled = true;
         }
 
         private void BTrash_Click(object sender, EventArgs e)
@@ -222,7 +253,7 @@ namespace DesafioCSharp
                 MessageBox.Show("Selecione um usuário para deletar.", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }else
             {
-                bool returnDao = userDao.DeletetUser(userList[index]);
+                bool returnDao = userDao.DeletetUser(userList[index], index);
                 if (returnDao == true)
                 {
                     MessageBox.Show("Usuário deletado com sucesso!", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -233,6 +264,11 @@ namespace DesafioCSharp
                     MessageBox.Show("Ocorreu um erro :(", "Mensagem", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void BSearch_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -20,9 +20,8 @@ namespace DesafioCSharp
             Application.Run(new CRUD());
             using (CRUD crud = new CRUD())
             {
-                
-            };
 
+            };
         }
 
     }

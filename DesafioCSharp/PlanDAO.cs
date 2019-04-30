@@ -12,17 +12,46 @@ namespace DesafioCSharp
     {
         public SqlConnection sql = new ConnectDb().DbConnect();
         public SqlCommand command = new SqlCommand();
-        internal static Dictionary<string, int> planDictionary = new Dictionary<string, int>();
+        internal static Dictionary<int, Plan> planDictionary = new Dictionary<int, Plan>();
         internal static List<Plan> planList = new List<Plan>();
-
-        internal Dictionary<string, int> GetDictionary()
-        {
-            return planDictionary;
-        }
 
         public List<Plan> GetList()
         {
             return planList;
+        }
+
+        public void SelectAll() // popula o dictionary com todos os planos
+        {
+            command.Connection = sql;
+            command.CommandText = "SELECT * FROM PLANS";
+            if (sql.State == ConnectionState.Open)
+            {
+                sql.Close();
+            }
+            try
+            {
+                sql.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        planDictionary.Add((int)reader["ID"], new Plan(reader["NAME"].ToString(),
+                                      Convert.ToDateTime(reader["STARTDATE"]), Convert.ToDateTime(reader["ENDDATE"])));
+                    }
+                }
+
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("Ocorreu um erro: " + ex);
+            }
+            finally
+            {
+                command.Dispose();
+                sql.Close();
+            }
+
         }
         public void ListAll()
         {
@@ -74,6 +103,7 @@ namespace DesafioCSharp
             {
                 sql.Open();
                 var idOfInserted = Convert.ToInt32(command.ExecuteScalar());
+                command.Parameters.Clear();
                 planList.Add(new Plan(idOfInserted, plan.Name, plan.StartDate, plan.EndDate));
 
                 return true;
@@ -90,7 +120,7 @@ namespace DesafioCSharp
                 sql.Close();
             }
         }
-        public bool UpdatePlan(Plan plan, int planId, int index)
+        public bool UpdatePlan(Plan plan, int index)
         {
             command.Connection = sql;
             command.CommandText = @"UPDATE PLANS SET NAME = @NAME, STARTDATE = @STARTDATE, 
@@ -99,7 +129,7 @@ namespace DesafioCSharp
             command.Parameters.AddWithValue("@NAME", plan.Name);
             command.Parameters.AddWithValue("@STARTDATE", plan.StartDate);
             command.Parameters.AddWithValue("@ENDDATE", plan.EndDate);
-            command.Parameters.AddWithValue("@ID", planId);
+            command.Parameters.AddWithValue("@ID", plan.Id);
 
             if (sql.State == ConnectionState.Open)
             {
@@ -109,7 +139,8 @@ namespace DesafioCSharp
             {
                 sql.Open();
                 command.ExecuteNonQuery();
-                planList[index] = new Plan(planId, plan.Name, plan.StartDate, plan.StartDate);
+                command.Parameters.Clear();
+                planList[index] = plan;
                 return true;
 
             }
@@ -125,7 +156,7 @@ namespace DesafioCSharp
             }
         }
 
-        public bool DeletePlan(Plan plan)
+        public bool DeletePlan(Plan plan, int index)
         {
             command.Connection = sql;
             command.CommandText = "DELETE FROM PLANS WHERE ID = @ID";
@@ -139,7 +170,8 @@ namespace DesafioCSharp
             {
                 sql.Open();
                 command.ExecuteNonQuery();
-                planList.Remove(plan);
+                command.Parameters.Clear();
+                planList.RemoveAt(index);
                 return true;
 
             }
